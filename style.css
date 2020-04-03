@@ -1,0 +1,62 @@
+* {
+  padding: 0; 
+  margin: 0;
+}
+
+.keyboard {
+  text-align: center; 
+  width: 90vw;
+  height: 35vh;
+  top: 300px;
+  margin: auto; 
+  background-color: purple;
+  user-select: none;
+}
+
+.textarea {
+  width: calc(90vw - 12px);
+  height: 15vh;
+  display: block;
+  margin: auto;
+  padding: 5px; 
+}
+
+.keyboard__key {
+  width: 5vw; 
+  height: 5vh;
+  border: none;
+  outline: none;
+  background-color: rgba(255, 255, 255, 0.6);
+  transition: background-color 0.1s;
+  margin: 5px 2px; 
+  border-radius: 10px; 
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  vertical-align: top;
+  user-select: none;
+}
+
+.keyboard__key:hover {
+  background-color: rgba(255, 255, 255, 0.99);
+}
+
+.keyboard__key_active {
+  background-color: rgba(150, 255, 150, 0.9);
+}
+
+.keyboard__key_active:hover {
+  background-color: rgba(150, 255, 150, 0.9);
+}
+
+.keyboard__key_large {
+  border-radius: 10px;
+  width: 10vw; 
+}
+
+.keyboard__key_space {
+  border-radius: 10px;
+  width: 43vw;
+  max-width: 400px;
+}

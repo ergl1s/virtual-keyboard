@@ -65,6 +65,53 @@ const KEYCODES = {
   'ctrlR': '17' //event.location 2  
 }
 
+const SHIFT_ON_EN = {
+  '`': '~',
+  '1': '!',
+  '2': '@',
+  '3': '#',
+  '4': '$',
+  '5': '%',
+  '6': '^',
+  '7': '&',
+  '8': '*',
+  '9': '(',
+  '0': ')',
+  '-': '_',
+  '=': '+',
+  '[': '{',
+  ']': '}',
+  '\\': '|',
+  ';': ':',
+  '\'': '\"',
+  ',': '<',
+  '.': '>',
+  '/': '?',
+}
+
+const SHIFT_OFF_EN = {
+  '~': '`',
+  '!': '1',
+  '@': '2',
+  '#': '3',
+  '$': '4',
+  '%': '5',
+  '^': '6',
+  '&': '7',
+  '*': '8',
+  '(': '9',
+  ')': '0',
+  '_': '-',
+  '+': '=',
+  '{': '[',
+  '}': ']',
+  '|': '\\',
+  ':': ';',
+  '\"': '\'',
+  '<': ',',
+  '>': '.',
+  '?': '/',
+}
 class Keyboard {
   elements = {
     keysContainer: null,
@@ -78,7 +125,8 @@ class Keyboard {
     ctrl: false,
     alt: false,
     win: false,
-    shift: false
+    shift: false,
+    lang: 'English'
   }
 
   constructor() {
@@ -126,13 +174,15 @@ class Keyboard {
               simpleKeys.forEach((simpleKey) => {
                 simpleKey.textContent = simpleKey.textContent.toUpperCase();
               });
-              keyElement.classList.add('keyboard__key_active');
             } else {
               simpleKeys.forEach((simpleKey) => {
                 simpleKey.textContent = simpleKey.textContent.toLowerCase();
               });
-              keyElement.classList.remove('keyboard__key_active');
             }
+            if (keyElement.classList.contains('keyboard__key_active')) 
+              keyElement.classList.remove('keyboard__key_active');
+            else 
+              keyElement.classList.add('keyboard__key_active');
           });
         }
         break;
@@ -147,20 +197,34 @@ class Keyboard {
         }
         break; 
 
+        case 'shiftR': 
         case 'shift': {
           keyElement.classList.add('keyboard__key_large');
           keyElement.textContent = key;
-        }
-        break;
-
-        case 'shiftR': {
-          keyElement.classList.add('keyboard__key_large');
-          keyElement.textContent = key;
-        }
-        break;
-
-        case 'shiftR': {
-          keyElement.textContent = key;
+          keyElement.addEventListener('mousedown', () => {
+            if (!this.elements.shift) {
+              this.elements.shift = !this.elements.shift;
+              let simpleKeys = document.querySelectorAll('.keyboard__key_simple');
+              this.properties.capsLock = !this.properties.capsLock;
+              if (this.properties.capsLock) {
+                simpleKeys.forEach((simpleKey) => {
+                  if (Object.keys(SHIFT_ON_EN).indexOf(simpleKey.textContent) !== -1) {
+                    simpleKey.textContent = SHIFT_ON_EN[simpleKey.textContent];
+                  } else
+                    simpleKey.textContent = simpleKey.textContent.toUpperCase();
+                });
+              } else {
+                simpleKeys.forEach((simpleKey) => {
+                  if (Object.keys(SHIFT_ON_EN).indexOf(simpleKey.textContent) !== -1) {
+                    simpleKey.textContent = SHIFT_ON_EN[simpleKey.textContent];
+                  } 
+                  else
+                    simpleKey.textContent = simpleKey.textContent.toLowerCase();
+                });
+              }
+            }
+            keyElement.classList.add('keyboard__key_active');
+          });
         }
         break;
 
@@ -285,24 +349,72 @@ class Keyboard {
           keyElement.classList.add('keyboard__key_simple');
           keyElement.addEventListener('mousedown', () => {
             keyElement.classList.add('keyboard__key_active');
-            this.elements.textarea.value += this.properties.capsLock ? key.toUpperCase() : key.toLowerCase();
+            this.elements.textarea.value += this.properties.capsLock ? keyElement.textContent.toUpperCase() : keyElement.textContent.toLowerCase();
           });
         }
         break;
       }
-      document.addEventListener('mouseup', () => {
-        keyElement.classList.remove('keyboard__key_active');
-      });
-      document.addEventListener('keyup', () => {
-        keyElement.classList.remove('keyboard__key_active');
-      });
-
       keyElement.value = KEYCODES[key];
       fragment.appendChild(keyElement);
       if (insertBr) {
           fragment.appendChild(document.createElement("br"));
       }; 
     })
+
+    document.addEventListener('mouseup', () => {
+      const activeKeys = document.querySelectorAll('.keyboard__key_active');
+      if (activeKeys.length == 1 && activeKeys[0].value == '16') {
+        let simpleKeys = document.querySelectorAll('.keyboard__key_simple');
+        this.properties.capsLock = !this.properties.capsLock;
+        if (this.properties.capsLock) {
+          simpleKeys.forEach((simpleKey) => {
+            if (Object.keys(SHIFT_OFF_EN).indexOf(simpleKey.textContent) !== -1) {
+            simpleKey.textContent = SHIFT_OFF_EN[simpleKey.textContent];
+            } else
+                simpleKey.textContent = simpleKey.textContent.toUpperCase();
+          });
+        } else {
+          simpleKeys.forEach((simpleKey) => {
+            if (Object.keys(SHIFT_OFF_EN).indexOf(simpleKey.textContent) !== -1) {
+              simpleKey.textContent = SHIFT_OFF_EN[simpleKey.textContent];
+            } else
+                simpleKey.textContent = simpleKey.textContent.toLowerCase();
+          });
+        }
+        this.elements.shift = !this.elements.shift;
+        activeKeys[0].classList.remove('keyboard__key_active');
+      } else
+          activeKeys.forEach((key) => {if (key.value != '16' &&key.value != '20') {key.classList.remove('keyboard__key_active')}});
+    })
+
+    document.addEventListener('keyup', () => {
+      const activeKeys = document.querySelectorAll('.keyboard__key_active');
+      activeKeys.forEach((activeKey) => {
+        if (event.keyCode == activeKey.value) {
+          if (event.keyCode == '16') {
+            let simpleKeys = document.querySelectorAll('.keyboard__key_simple');
+            this.properties.capsLock = !this.properties.capsLock;
+            if (this.properties.capsLock) {
+              simpleKeys.forEach((simpleKey) => {
+                if (Object.keys(SHIFT_OFF_EN).indexOf(simpleKey.textContent) !== -1) {
+                simpleKey.textContent = SHIFT_OFF_EN[simpleKey.textContent];
+                } else
+                    simpleKey.textContent = simpleKey.textContent.toUpperCase();
+              });
+            } else {
+              simpleKeys.forEach((simpleKey) => {
+                if (Object.keys(SHIFT_OFF_EN).indexOf(simpleKey.textContent) !== -1) {
+                  simpleKey.textContent = SHIFT_OFF_EN[simpleKey.textContent];
+                } else
+                    simpleKey.textContent = simpleKey.textContent.toLowerCase();
+              });
+            }
+            this.elements.shift = !this.elements.shift;
+          }
+          activeKey.classList.remove('keyboard__key_active');
+        }
+      })
+    });
     return fragment;
   }
 
@@ -312,7 +424,6 @@ class Keyboard {
     for(let i = 0; i < keys.length; i++) {
       if(event.location != 2) {
         if(event.keyCode == keys[i].value) {
-          console.log(keys[i]);
           if (event.keyCode == "20") keys[i].click();
           else keys[i].dispatchEvent(new Event('mousedown'));
           break;
@@ -321,7 +432,6 @@ class Keyboard {
       else {
         if(event.keyCode == keys[i].value) {
           if(flag) {
-            console.log(keys[i]);
             keys[i].dispatchEvent(new Event('mousedown'));
             break;
           }
@@ -331,6 +441,7 @@ class Keyboard {
       }
     }
   }
+
   onKeyUp(event) {
     if(event.keyCode == "20") {
       this.elements.capsLock.click();

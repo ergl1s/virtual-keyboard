@@ -36,6 +36,8 @@
   align-items: center;
   vertical-align: top;
   user-select: none;
+  font-size: 1.2rem;
+  overflow: hidden;
 }
 
 .keyboard__key:hover {

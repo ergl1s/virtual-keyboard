@@ -73,6 +73,7 @@ body {
 }
 
 .paragraph {
-  margin: 15px calc(20vw);
+  margin: 10px auto;
+  width: 900px;
   font-size: 18px;
 }
